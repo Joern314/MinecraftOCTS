@@ -17,36 +17,41 @@ local Failure = ____util.Failure
 local Success = ____util.Success
 local isFailure = ____util.isFailure
 function ____exports.parseVoxels(self, obj, blocks)
-    local s2 = #obj.layers
-    local s1 = #obj.layers[1]
-    local s0 = #obj.layers[1][1]
+    local size2 = #obj.layers
+    local size1 = #obj.layers[1]
+    local size0 = #obj.layers[1][1]
     local voxels = __TS__New(VoxelMap)
     local axes_map = {x = 0, y = 1, z = 2}
-    local _axis_perm = {-1, -1, -1}
-    local a = string.sub(obj.config.axes[1], 2, 2)
-    _axis_perm[axes_map[a]] = 0
-    _axis_perm[axes_map[string.sub(obj.config.axes[2], 2, 2)]] = 1
-    _axis_perm[axes_map[string.sub(obj.config.axes[3], 2, 2)]] = 2
-    local _axis_sign = {-1, -1, -1}
-    _axis_sign[1] = ((string.sub(obj.config.axes[_axis_perm[1] + 1], 1, 1) == "+") and 1) or -1
-    _axis_sign[2] = ((string.sub(obj.config.axes[_axis_perm[2] + 1], 1, 1) == "+") and 1) or -1
-    _axis_sign[3] = ((string.sub(obj.config.axes[_axis_perm[3] + 1], 1, 1) == "+") and 1) or -1
+    local axes_pos = {x = -1, y = -1, z = -1}
+    local a0 = string.sub(obj.config.axes[1], 2, 2)
+    local a1 = string.sub(obj.config.axes[2], 2, 2)
+    local a2 = string.sub(obj.config.axes[3], 2, 2)
+    local s0 = ((string.sub(obj.config.axes[1], 1, 1) == "+") and 1) or -1
+    local s1 = ((string.sub(obj.config.axes[1], 1, 1) == "+") and 1) or -1
+    local s2 = ((string.sub(obj.config.axes[1], 1, 1) == "+") and 1) or -1
+    axes_pos[a0] = 0
+    axes_pos[a1] = 1
+    axes_pos[a2] = 2
+    local axes_sign = {x = -1, y = -1, z = -1}
+    axes_sign[a0] = s0
+    axes_sign[a1] = s1
+    axes_sign[a2] = s2
     local orig = obj.config.origin
     local function transform(self, v)
-        local x = _axis_sign[1] * v[_axis_perm[1] + 1]
-        local y = _axis_sign[2] * v[_axis_perm[2] + 1]
-        local z = _axis_sign[3] * v[_axis_perm[3] + 1]
+        local x = axes_sign.x * v[axes_pos.x + 1]
+        local y = axes_sign.y * v[axes_pos.y + 1]
+        local z = axes_sign.z * v[axes_pos.z + 1]
         return sum(nil, orig, {x, y, z})
     end
     do
         local i2 = 0
-        while i2 < s2 do
+        while i2 < size2 do
             do
                 local i1 = 0
-                while i1 < s1 do
+                while i1 < size1 do
                     do
                         local i0 = 0
-                        while i0 < s0 do
+                        while i0 < size0 do
                             local char = __TS__StringCharAt(obj.layers[i2 + 1][i1 + 1], i0)
                             local block = blocks[char]
                             if block ~= nil then

@@ -101,13 +101,13 @@ export class TaskFarmBreak extends Task {
         this.priority = <number>param.priority || 10.0;
         this.loc = loc;
         this.regrow_time = <number>param.regrow_time;
-        this.retry_time =  <number>param.retry_time || (this.regrow_time / 2);
+        this.retry_time = <number>param.retry_time || (this.regrow_time / 2);
 
         this.next_schedule = os.time();
     }
     onExecute() {
         let s = break_block(this.loc);
-        if(isFailure(s)) {
+        if (isFailure(s)) {
             this.next_schedule = os.time() + this.retry_time;
         } else {
             this.next_schedule = os.time() + this.regrow_time;
@@ -127,7 +127,8 @@ export type TaskObj = unknown & {
     location: string | Vec3,
     [other: string]: any,
 };
-export type Axis = "+x" | "-x" | "+y" | "-y" | "+z" | "-z";
+export type SignedAxis = "+x" | "-x" | "+y" | "-y" | "+z" | "-z";
+export type Axis = "x" | "y" | "z";
 
 export type AreaMapObj = {
     blocks: {
@@ -135,7 +136,7 @@ export type AreaMapObj = {
     },
     config: {
         origin: Vec3
-        axes: [Axis, Axis, Axis],
+        axes: [SignedAxis, SignedAxis, SignedAxis],
     },
     tasks: Array<TaskObj>,
     layers: Array<Array<string>>
@@ -145,7 +146,7 @@ export type BlockDict = Partial<{
 }>;
 export function parseBlocks(obj: AreaMapObj): BlockDict {
     let blocks: BlockDict = {};
-    for(let bchar in obj.blocks) {
+    for (let bchar in obj.blocks) {
         let bobj = obj.blocks[bchar]!;
         blocks[bchar] = {
             passable: bobj.passable !== undefined ? bobj.passable : false,
@@ -162,35 +163,40 @@ export function parseAreaMap(obj: AreaMapObj): [VoxelMap<VData>, Array<Task>] {
     return [map, tasks];
 }
 export function parseVoxels(obj: AreaMapObj, blocks: BlockDict): VoxelMap<VData> {
-    let s2 = obj.layers.length;
-    let s1 = obj.layers[0].length;
-    let s0 = obj.layers[0][0].length;
+    let size2 = obj.layers.length;
+    let size1 = obj.layers[0].length;
+    let size0 = obj.layers[0][0].length;
 
     let voxels = new VoxelMap<VData>();
 
-    let axes_map: any = { "x": 0, "y": 1, "z": 2};
-    const _axis_perm = [-1, -1, -1];
+    let axes_map = { "x": 0, "y": 1, "z": 2 };
+    let axes_pos = { "x": -1, "y": -1, "z": -1 };
 
-    let a = obj.config.axes[0].charAt(1);
-    _axis_perm[axes_map[a]] = 0
-    _axis_perm[axes_map[obj.config.axes[1].charAt(1)]] = 1
-    _axis_perm[axes_map[obj.config.axes[2].charAt(1)]] = 2
-    const _axis_sign = [-1, -1, -1];
-    _axis_sign[0] = obj.config.axes[_axis_perm[0]].charAt(0) === "+" ? 1 : -1;
-    _axis_sign[1] = obj.config.axes[_axis_perm[1]].charAt(0) === "+" ? 1 : -1;
-    _axis_sign[2] = obj.config.axes[_axis_perm[2]].charAt(0) === "+" ? 1 : -1;
+    let a0 = <Axis>(obj.config.axes[0].charAt(1));
+    let a1 = <Axis>(obj.config.axes[1].charAt(1));
+    let a2 = <Axis>(obj.config.axes[2].charAt(1));
+    let s0 = obj.config.axes[0].charAt(0) == "+" ? +1 : -1;
+    let s1 = obj.config.axes[0].charAt(0) == "+" ? +1 : -1;
+    let s2 = obj.config.axes[0].charAt(0) == "+" ? +1 : -1;
+    axes_pos[a0] = 0;
+    axes_pos[a1] = 1;
+    axes_pos[a2] = 2;
+    let axes_sign = { "x": -1, "y": -1, "z": -1 };
+    axes_sign[a0] = s0;
+    axes_sign[a1] = s1;
+    axes_sign[a2] = s2;
 
     const orig = obj.config.origin;
     function transform(v: Vec3): Vec3 {
-        let x = _axis_sign[0] * v[_axis_perm[0]];
-        let y = _axis_sign[1] * v[_axis_perm[1]];
-        let z = _axis_sign[2] * v[_axis_perm[2]];
-        return sum(orig, [x,y,z]);
+        let x = axes_sign.x * v[axes_pos.x];
+        let y = axes_sign.y * v[axes_pos.y];
+        let z = axes_sign.z * v[axes_pos.z];
+        return sum(orig, [x, y, z]);
     }
 
-    for (let i2 = 0; i2 < s2; i2++) {
-        for (let i1 = 0; i1 < s1; i1++) {
-            for (let i0 = 0; i0 < s0; i0++) {
+    for (let i2 = 0; i2 < size2; i2++) {
+        for (let i1 = 0; i1 < size1; i1++) {
+            for (let i0 = 0; i0 < size0; i0++) {
                 let char = obj.layers[i2][i1].charAt(i0);
                 let block = blocks[char];
                 // clone and adjust
@@ -201,7 +207,7 @@ export function parseVoxels(obj: AreaMapObj, blocks: BlockDict): VoxelMap<VData>
                     block.char = char;
                 }
 
-                let v = transform([i0,i1,i2]);
+                let v = transform([i0, i1, i2]);
                 voxels.set(v, block);
             }
         }

@@ -239,7 +239,7 @@ function TaskFarmBreak.prototype.____constructor(self, param, loc)
     TaskFarmBreak.____super.prototype.____constructor(self)
     self.priority = param.priority or 10
     self.loc = loc
-    self.regrow_time = param.regrow_time
+    self.regrow_time = param.regrow_time or 30
     self.retry_time = param.retry_time or (self.regrow_time / 2)
     self.next_schedule = os.time()
 end

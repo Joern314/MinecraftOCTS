@@ -100,7 +100,7 @@ export class TaskFarmBreak extends Task {
         super();
         this.priority = <number>param.priority || 10.0;
         this.loc = loc;
-        this.regrow_time = <number>param.regrow_time;
+        this.regrow_time = <number>param.regrow_time || 30.0;
         this.retry_time = <number>param.retry_time || (this.regrow_time / 2);
 
         this.next_schedule = os.time();

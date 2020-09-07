@@ -15,7 +15,7 @@ export const example: AreaMapObj = {
         {
             action: "farm_break",
             location: "h",
-            timer: 30.0,
+            regrow_time: 30.0,
         },
     ],
     layers: [

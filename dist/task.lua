@@ -23,7 +23,8 @@ function ____exports.parseVoxels(self, obj, blocks)
     local voxels = __TS__New(VoxelMap)
     local axes_map = {x = 0, y = 1, z = 2}
     local _axis_perm = {-1, -1, -1}
-    _axis_perm[axes_map[string.sub(obj.config.axes[1], 2, 2)]] = 0
+    local a = string.sub(obj.config.axes[1], 2, 2)
+    _axis_perm[axes_map[a]] = 0
     _axis_perm[axes_map[string.sub(obj.config.axes[2], 2, 2)]] = 1
     _axis_perm[axes_map[string.sub(obj.config.axes[3], 2, 2)]] = 2
     local _axis_sign = {-1, -1, -1}

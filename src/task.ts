@@ -170,7 +170,9 @@ export function parseVoxels(obj: AreaMapObj, blocks: BlockDict): VoxelMap<VData>
 
     let axes_map: any = { "x": 0, "y": 1, "z": 2};
     const _axis_perm = [-1, -1, -1];
-    _axis_perm[axes_map[obj.config.axes[0].charAt(1)]] = 0
+
+    let a = obj.config.axes[0].charAt(1);
+    _axis_perm[axes_map[a]] = 0
     _axis_perm[axes_map[obj.config.axes[1].charAt(1)]] = 1
     _axis_perm[axes_map[obj.config.axes[2].charAt(1)]] = 2
     const _axis_sign = [-1, -1, -1];

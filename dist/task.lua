@@ -2,9 +2,11 @@
 require("lualib_bundle");
 local ____exports = {}
 local ____geom = require("geom")
+local VoxelMap = ____geom.VoxelMap
 local getPath = ____geom.getPath
 local toSide = ____geom.toSide
 local Side = ____geom.Side
+local sum = ____geom.sum
 local ____nav = require("nav")
 local getPosition = ____nav.getPosition
 local move = ____nav.move
@@ -15,6 +17,109 @@ local Failure = ____util.Failure
 local Success = ____util.Success
 local isFailure = ____util.isFailure
 local robot = require("robot")
+function ____exports.parseVoxels(self, obj, blocks)
+    local s2 = #obj.layers
+    local s1 = #obj.layers[1]
+    local s0 = #obj.layers[1][1]
+    local voxels = __TS__New(VoxelMap)
+    local axes_map = {x = 0, y = 1, z = 2}
+    local _axis_perm = {-1, -1, -1}
+    _axis_perm[axes_map[string.sub(obj.config.axes[1], 2, 2)]] = 0
+    _axis_perm[axes_map[string.sub(obj.config.axes[2], 2, 2)]] = 1
+    _axis_perm[axes_map[string.sub(obj.config.axes[3], 2, 2)]] = 2
+    local _axis_sign = {-1, -1, -1}
+    _axis_sign[1] = ((string.sub(obj.config.axes[_axis_perm[1] + 1], 1, 1) == "+") and 1) or -1
+    _axis_sign[2] = ((string.sub(obj.config.axes[_axis_perm[2] + 1], 1, 1) == "+") and 1) or -1
+    _axis_sign[3] = ((string.sub(obj.config.axes[_axis_perm[3] + 1], 1, 1) == "+") and 1) or -1
+    local orig = obj.config.origin
+    local function transform(self, v)
+        local x = _axis_sign[1] * v[_axis_perm[1] + 1]
+        local y = _axis_sign[2] * v[_axis_perm[2] + 1]
+        local z = _axis_sign[3] * v[_axis_perm[3] + 1]
+        return sum(nil, orig, {x, y, z})
+    end
+    do
+        local i2 = 0
+        while i2 < s2 do
+            do
+                local i1 = 0
+                while i1 < s1 do
+                    do
+                        local i0 = 0
+                        while i0 < s0 do
+                            local char = __TS__StringCharAt(obj.layers[i2 + 1][i1 + 1], i0)
+                            local block = blocks[char]
+                            if block ~= nil then
+                                block = __TS__ObjectAssign({}, block)
+                            else
+                                block = __TS__ObjectAssign({}, blocks.default)
+                                block.char = char
+                            end
+                            local v = transform(nil, {i0, i1, i2})
+                            voxels:set(v, block)
+                            i0 = i0 + 1
+                        end
+                    end
+                    i1 = i1 + 1
+                end
+            end
+            i2 = i2 + 1
+        end
+    end
+    return voxels
+end
+function ____exports.parseTasks(self, obj, map)
+    local tasks = {}
+    for ____, tobj in ipairs(obj.tasks) do
+        local tlist = ____exports.parseTaskMulti(nil, tobj, map)
+        tasks = __TS__ArrayFlat({tasks, tlist})
+    end
+    return tasks
+end
+function ____exports.parseTaskMulti(self, obj, map)
+    local locations
+    if type(obj.location) == "string" then
+        locations = {}
+        map:foreach(
+            function(____, d)
+                if d.char == obj.location then
+                    __TS__ArrayPush(locations, d.xyz)
+                end
+            end
+        )
+    else
+        locations = {obj.location}
+    end
+    local tasks = {}
+    for ____, loc in ipairs(locations) do
+        local task = ____exports.parseTask(
+            nil,
+            obj,
+            map:get(loc),
+            loc
+        )
+        if task ~= nil then
+            __TS__ArrayPush(tasks, task)
+        end
+    end
+    return tasks
+end
+function ____exports.parseTask(self, obj, block, loc)
+    local ____switch47 = obj.action
+    if ____switch47 == "farm_break" then
+        goto ____switch47_case_0
+    end
+    goto ____switch47_case_default
+    ::____switch47_case_0::
+    do
+        return __TS__New(____exports.TaskFarmBreak, obj, loc)
+    end
+    ::____switch47_case_default::
+    do
+        return nil
+    end
+    ::____switch47_end::
+end
 function ____exports.getVoxelMap(self)
     local a = {}
     return a
@@ -146,5 +251,22 @@ function TaskFarmBreak.prototype.getPriority(self)
     else
         return self.priority
     end
+end
+function ____exports.parseBlocks(self, obj)
+    local blocks = {}
+    for bchar in pairs(obj.blocks) do
+        local bobj = obj.blocks[bchar]
+        blocks[bchar] = {
+            passable = (((bobj.passable ~= nil) and (function() return bobj.passable end)) or (function() return false end))(),
+            char = bchar
+        }
+    end
+    return blocks
+end
+function ____exports.parseAreaMap(self, obj)
+    local blocks = ____exports.parseBlocks(nil, obj)
+    local map = ____exports.parseVoxels(nil, obj, blocks)
+    local tasks = ____exports.parseTasks(nil, obj, map)
+    return {map, tasks}
 end
 return ____exports

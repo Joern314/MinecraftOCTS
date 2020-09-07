@@ -1,6 +1,7 @@
 import { Vec3, VoxelMap, Voxel, sum } from "./geom"
 import { Task, TaskFarmBreak, AreaMapObj, parseAreaMap } from "./task"
 import { Try } from "./util";
+require("util2");
 
 export const example: AreaMapObj = {
     blocks: {

@@ -111,22 +111,25 @@ function ____exports.parseTaskMulti(self, obj, map)
     return tasks
 end
 function ____exports.parseTask(self, obj, block, loc)
-    local ____switch47 = obj.action
-    if ____switch47 == "farm_break" then
-        goto ____switch47_case_0
+    local ____switch48 = obj.action
+    if ____switch48 == "farm_break" then
+        goto ____switch48_case_0
     end
-    goto ____switch47_case_default
-    ::____switch47_case_0::
+    goto ____switch48_case_default
+    ::____switch48_case_0::
     do
         return __TS__New(____exports.TaskFarmBreak, obj, loc)
     end
-    ::____switch47_case_default::
+    ::____switch48_case_default::
     do
         return nil
     end
-    ::____switch47_end::
+    ::____switch48_end::
 end
 ____exports.state = {}
+function ____exports.foo(self)
+    return nil
+end
 function ____exports.getVoxelMap(self)
     return ____exports.state.map
 end
@@ -191,30 +194,30 @@ function ____exports.break_block(self, target)
     )
     local success
     local interact
-    local ____switch14 = side
-    if ____switch14 == Side.top then
-        goto ____switch14_case_0
-    elseif ____switch14 == Side.bottom then
-        goto ____switch14_case_1
+    local ____switch15 = side
+    if ____switch15 == Side.top then
+        goto ____switch15_case_0
+    elseif ____switch15 == Side.bottom then
+        goto ____switch15_case_1
     end
-    goto ____switch14_case_default
-    ::____switch14_case_0::
+    goto ____switch15_case_default
+    ::____switch15_case_0::
     do
         success, interact = robot.swingUp()
-        goto ____switch14_end
+        goto ____switch15_end
     end
-    ::____switch14_case_1::
+    ::____switch15_case_1::
     do
         success, interact = robot.swingDown()
-        goto ____switch14_end
+        goto ____switch15_end
     end
-    ::____switch14_case_default::
+    ::____switch15_case_default::
     do
         turn(nil, face)
         success, interact = robot.swing()
-        goto ____switch14_end
+        goto ____switch15_end
     end
-    ::____switch14_end::
+    ::____switch15_end::
     if success then
         return Success(nil, interact)
     else

@@ -15,6 +15,10 @@ export const state: {
     tasks: Array<Task>
 } = <any>{};
 
+export function foo() {
+    return undefined;
+}
+
 export function getVoxelMap(): VoxelMap<VData> {
     return state.map;
 }

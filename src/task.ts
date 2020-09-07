@@ -1,8 +1,7 @@
 import { Vec3, Facing, VoxelMap, Voxel, getPath, toSide, Side, Facing2d, sum } from "./geom";
 import { getPosition, move, turn, getFacing } from "./nav";
 import { Try, Failure, Success, isSuccess, isFailure } from "./util";
-//import * as robot from "robot"
-const robot: any = {};
+import * as robot from "robot"
 
 export type VData = {
     passable: boolean,
@@ -11,9 +10,13 @@ export type VData = {
     reversePath?: Facing,
 };
 
+let state: {
+    map: VoxelMap<VData>,
+    tasks: Array<Task>
+} = <any>{};
+
 export function getVoxelMap(): VoxelMap<VData> {
-    let a: any = {}
-    return a;
+    return state.map;
 }
 
 export function go_to(target: Vec3): Try<true> {
@@ -254,7 +257,7 @@ export function parseTask(obj: TaskObj, block: Voxel<VData>, loc: Vec3): Task | 
 }
 
 const IDLE_TASK: Task = {
-    onExecute() {},
+    onExecute() { },
     getPriority() {
         os.sleep(1.0)
         return 0
@@ -264,22 +267,22 @@ const IDLE_TASK: Task = {
 export function pickHighestPriority(tasks: Array<Task>) {
     let optimum: Task = IDLE_TASK;
     let priority: number = 0;
-    for(let task of tasks) {
+    for (let task of tasks) {
         let p = task.getPriority();
-        if(p > priority) {
+        if (p > priority) {
             optimum = task;
             priority = p;
         }
     }
     return optimum;
 }
-export function executor(tasks: Array<Task>) {
-    let task = pickHighestPriority(tasks);
-    task.onExecute();
-}
 
-export function executorLoop(tasks: Array<Task>) {
-    while(true) {
-        executor(tasks);
+export function executorLoop(map: VoxelMap<VData>, tasks: Array<Task>) {
+    state.map = map;
+    state.tasks = tasks;
+    
+    while (true) {
+        let task = pickHighestPriority(state.tasks);
+        task.onExecute();
     }
 }

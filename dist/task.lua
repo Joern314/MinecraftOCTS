@@ -16,6 +16,7 @@ local ____util = require("util")
 local Failure = ____util.Failure
 local Success = ____util.Success
 local isFailure = ____util.isFailure
+local robot = require("robot")
 function ____exports.parseVoxels(self, obj, blocks)
     local size2 = #obj.layers
     local size1 = #obj.layers[1]
@@ -125,10 +126,9 @@ function ____exports.parseTask(self, obj, block, loc)
     end
     ::____switch47_end::
 end
-local robot = {}
+local state = {}
 function ____exports.getVoxelMap(self)
-    local a = {}
-    return a
+    return state.map
 end
 function ____exports.go_to(self, target)
     local map = ____exports.getVoxelMap(nil)
@@ -200,18 +200,18 @@ function ____exports.break_block(self, target)
     goto ____switch14_case_default
     ::____switch14_case_0::
     do
-        success, interact = robot:swingUp()
+        success, interact = robot.swingUp()
         goto ____switch14_end
     end
     ::____switch14_case_1::
     do
-        success, interact = robot:swingDown()
+        success, interact = robot.swingDown()
         goto ____switch14_end
     end
     ::____switch14_case_default::
     do
         turn(nil, face)
-        success, interact = robot:swing()
+        success, interact = robot.swing()
         goto ____switch14_end
     end
     ::____switch14_end::
@@ -295,13 +295,12 @@ function ____exports.pickHighestPriority(self, tasks)
     end
     return optimum
 end
-function ____exports.executor(self, tasks)
-    local task = ____exports.pickHighestPriority(nil, tasks)
-    task:onExecute()
-end
-function ____exports.executorLoop(self, tasks)
+function ____exports.executorLoop(self, map, tasks)
+    state.map = map
+    state.tasks = tasks
     while true do
-        ____exports.executor(nil, tasks)
+        local task = ____exports.pickHighestPriority(nil, state.tasks)
+        task:onExecute()
     end
 end
 return ____exports

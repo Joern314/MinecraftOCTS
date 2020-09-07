@@ -252,3 +252,34 @@ export function parseTask(obj: TaskObj, block: Voxel<VData>, loc: Vec3): Task | 
         default: return undefined;
     }
 }
+
+const IDLE_TASK: Task = {
+    onExecute() {},
+    getPriority() {
+        os.sleep(1.0)
+        return 0
+    }
+};
+
+export function pickHighestPriority(tasks: Array<Task>) {
+    let optimum: Task = IDLE_TASK;
+    let priority: number = 0;
+    for(let task of tasks) {
+        let p = task.getPriority();
+        if(p > priority) {
+            optimum = task;
+            priority = p;
+        }
+    }
+    return optimum;
+}
+export function executor(tasks: Array<Task>) {
+    let task = pickHighestPriority(tasks);
+    task.onExecute();
+}
+
+export function executorLoop(tasks: Array<Task>) {
+    while(true) {
+        executor(tasks);
+    }
+}

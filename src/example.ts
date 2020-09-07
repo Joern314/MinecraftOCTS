@@ -40,4 +40,4 @@ export const example: AreaMapObj = {
     ]
 }
 
-let [map, tasks] = parseAreaMap(example);
+export let [map, tasks] = parseAreaMap(example);

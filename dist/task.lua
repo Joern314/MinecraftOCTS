@@ -275,4 +275,33 @@ function ____exports.parseAreaMap(self, obj)
     local tasks = ____exports.parseTasks(nil, obj, map)
     return {map, tasks}
 end
+local IDLE_TASK = {
+    onExecute = function(self)
+    end,
+    getPriority = function(self)
+        os.sleep(1)
+        return 0
+    end
+}
+function ____exports.pickHighestPriority(self, tasks)
+    local optimum = IDLE_TASK
+    local priority = 0
+    for ____, task in ipairs(tasks) do
+        local p = task:getPriority()
+        if p > priority then
+            optimum = task
+            priority = p
+        end
+    end
+    return optimum
+end
+function ____exports.executor(self, tasks)
+    local task = ____exports.pickHighestPriority(nil, tasks)
+    task:onExecute()
+end
+function ____exports.executorLoop(self, tasks)
+    while true do
+        ____exports.executor(nil, tasks)
+    end
+end
 return ____exports

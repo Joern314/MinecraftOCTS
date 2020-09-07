@@ -126,9 +126,9 @@ function ____exports.parseTask(self, obj, block, loc)
     end
     ::____switch47_end::
 end
-local state = {}
+____exports.state = {}
 function ____exports.getVoxelMap(self)
-    return state.map
+    return ____exports.state.map
 end
 function ____exports.go_to(self, target)
     local map = ____exports.getVoxelMap(nil)
@@ -296,10 +296,10 @@ function ____exports.pickHighestPriority(self, tasks)
     return optimum
 end
 function ____exports.executorLoop(self, map, tasks)
-    state.map = map
-    state.tasks = tasks
+    ____exports.state.map = map
+    ____exports.state.tasks = tasks
     while true do
-        local task = ____exports.pickHighestPriority(nil, state.tasks)
+        local task = ____exports.pickHighestPriority(nil, ____exports.state.tasks)
         task:onExecute()
     end
 end

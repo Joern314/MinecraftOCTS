@@ -10,7 +10,7 @@ export type VData = {
     reversePath?: Facing,
 };
 
-let state: {
+export const state: {
     map: VoxelMap<VData>,
     tasks: Array<Task>
 } = <any>{};
@@ -280,7 +280,7 @@ export function pickHighestPriority(tasks: Array<Task>) {
 export function executorLoop(map: VoxelMap<VData>, tasks: Array<Task>) {
     state.map = map;
     state.tasks = tasks;
-    
+
     while (true) {
         let task = pickHighestPriority(state.tasks);
         task.onExecute();

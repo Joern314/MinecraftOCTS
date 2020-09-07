@@ -16,7 +16,6 @@ local ____util = require("util")
 local Failure = ____util.Failure
 local Success = ____util.Success
 local isFailure = ____util.isFailure
-local robot = require("robot")
 function ____exports.parseVoxels(self, obj, blocks)
     local s2 = #obj.layers
     local s1 = #obj.layers[1]
@@ -120,6 +119,7 @@ function ____exports.parseTask(self, obj, block, loc)
     end
     ::____switch47_end::
 end
+local robot = {}
 function ____exports.getVoxelMap(self)
     local a = {}
     return a
@@ -194,18 +194,18 @@ function ____exports.break_block(self, target)
     goto ____switch14_case_default
     ::____switch14_case_0::
     do
-        success, interact = robot.swingUp()
+        success, interact = robot:swingUp()
         goto ____switch14_end
     end
     ::____switch14_case_1::
     do
-        success, interact = robot.swingDown()
+        success, interact = robot:swingDown()
         goto ____switch14_end
     end
     ::____switch14_case_default::
     do
         turn(nil, face)
-        success, interact = robot.swing()
+        success, interact = robot:swing()
         goto ____switch14_end
     end
     ::____switch14_end::

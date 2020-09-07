@@ -1,7 +1,8 @@
 import { Vec3, Facing, VoxelMap, Voxel, getPath, toSide, Side, Facing2d, sum } from "./geom";
 import { getPosition, move, turn, getFacing } from "./nav";
 import { Try, Failure, Success, isSuccess, isFailure } from "./util";
-import * as robot from "robot"
+//import * as robot from "robot"
+const robot: any = {};
 
 export type VData = {
     passable: boolean,

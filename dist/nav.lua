@@ -1,13 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local robot = require("robot")
 local ____geom = require("geom")
 local Side = ____geom.Side
 local toSide = ____geom.toSide
 local toFacing = ____geom.toFacing
 local toNormal = ____geom.toNormal
 local sum = ____geom.sum
-local _state
+local robot, _state
 function ____exports.getPosition(self)
     return _state.v
 end
@@ -38,12 +37,12 @@ function ____exports.turnSide(self, s)
     end
     ::____switch8_case_1::
     do
-        robot.turnLeft()
+        robot:turnLeft()
         goto ____switch8_end
     end
     ::____switch8_case_2::
     do
-        robot.turnRight()
+        robot:turnRight()
         goto ____switch8_end
     end
     ::____switch8_case_3::
@@ -91,28 +90,28 @@ function ____exports.moveSide(self, s, preserve_facing)
     goto ____switch11_end
     ::____switch11_case_0::
     do
-        success, ____error = robot.up()
+        success, ____error = robot:up()
         goto ____switch11_end
     end
     ::____switch11_case_1::
     do
-        success, ____error = robot.down()
+        success, ____error = robot:down()
         goto ____switch11_end
     end
     ::____switch11_case_2::
     do
-        success, ____error = robot.forward()
+        success, ____error = robot:forward()
         goto ____switch11_end
     end
     ::____switch11_case_3::
     do
-        success, ____error = robot.back()
+        success, ____error = robot:back()
         goto ____switch11_end
     end
     ::____switch11_case_4::
     do
         ____exports.turnSide(nil, Side.left)
-        success, ____error = robot.forward()
+        success, ____error = robot:forward()
         if preserve_facing then
             ____exports.turnSide(nil, Side.right)
         end
@@ -121,7 +120,7 @@ function ____exports.moveSide(self, s, preserve_facing)
     ::____switch11_case_5::
     do
         ____exports.turnSide(nil, Side.right)
-        success, ____error = robot.forward()
+        success, ____error = robot:forward()
         if preserve_facing then
             ____exports.turnSide(nil, Side.left)
         end
@@ -138,6 +137,7 @@ function ____exports.moveSide(self, s, preserve_facing)
         return {false, ____error}
     end
 end
+robot = {}
 _state = {v = {0, 0, 0}, facing = 0}
 function ____exports.turn(self, f)
     local s = toSide(

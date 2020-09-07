@@ -1,5 +1,6 @@
 import * as computer from "computer"
-import * as robot from "robot"
+//import * as robot from "robot"
+const robot: any = {};
 import * as sides from "sides"
 import { Vec3, Facing, Side, toSide, Facing2d, Side2d, toFacing, toNormal, sum } from "./geom"
 
